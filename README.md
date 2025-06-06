@@ -124,21 +124,9 @@ Mike Chen,45,Small Business Owner,Austin,55000,Sports;Family,High School
 ## 🎭 Understanding Persona Behavior
 
 ### Personality-Driven Responses
-Each persona exhibits authentic behavior patterns:
-
-- **Extroverted (4-5/5)**: Respond frequently, speak faster, jump in quickly
-- **Introverted (1-2/5)**: Respond rarely, take time think, give brief answers
-- **Agreeable**: More likely to support others' ideas
-- **Disagreeable**: More likely to challenge or offer contrasting views
-- **Open**: Creative responses, embrace new ideas
-- **Conscientious**: Detail-oriented, practical considerations
+Each persona exhibits authentic behavior 
 
 ### Natural Conversation Patterns
-- **Varied Response Lengths**: From one-word answers to detailed explanations
-- **Realistic Participation**: Not everyone responds to every question
-- **Authentic Speech**: Natural fillers like "um," "well," "you know"
-- **Human Quirks**: Unfinished thoughts, tangents, misunderstandings
-- **Dynamic Interaction**: Build on others' comments, show agreement/disagreement
 
 ## 🔧 Configuration
 
@@ -156,7 +144,7 @@ OPENAI_MODEL=gpt-4o-mini          # Optional: Model to use (default: gpt-4o-mini
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help makes MicroCrowd better for everyone.
+Welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help makes MicroCrowd better for everyone.
 
 ### Ways to Contribute
 - 🐛 **Bug Reports**: Found an issue? Open a GitHub issue
