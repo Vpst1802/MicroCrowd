@@ -207,6 +207,4 @@ Want to influence the future of MicroCrowd? Join our discussions and share your 
 
 ---
 
-**Built with ❤️ for the research community**
-
-*Transform your data into insights, one conversation at a time.*
+**Built with ❤️ for the opensource community**
