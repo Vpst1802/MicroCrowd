@@ -58,7 +58,7 @@ MicroCrowd revolutionizes market research by converting your existing CSV data i
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/microcrowd.git
+   git clone https://github.com/vpst1802/microcrowd.git
    cd microcrowd
    ```
 
@@ -125,7 +125,7 @@ Mike Chen,45,Small Business Owner,Austin,55000,Sports;Family,High School
 Each persona exhibits authentic behavior patterns:
 
 - **Extroverted (4-5/5)**: Respond frequently, speak faster, jump in quickly
-- **Introverted (1-2/5)**: Respond rarely, take time to think, give brief answers
+- **Introverted (1-2/5)**: Respond rarely, take time think, give brief answers
 - **Agreeable**: More likely to support others' ideas
 - **Disagreeable**: More likely to challenge or offer contrasting views
 - **Open**: Creative responses, embrace new ideas
@@ -186,9 +186,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - **Documentation**: Check this README and inline help
-- **Issues**: Report bugs on [GitHub Issues](https://github.com/yourusername/microcrowd/issues)
-- **Discussions**: Join community discussions in [GitHub Discussions](https://github.com/yourusername/microcrowd/discussions)
-- **Email**: Contact the maintainer at [your-email@domain.com]
+- **Issues**: Report bugs on [GitHub Issues](https://github.com/vpst1802/microcrowd/issues)
+- **Discussions**: Join community discussions in [GitHub Discussions](https://github.com/vpst1802/microcrowd/discussions)
+- **Email**: Contact the maintainer at vinay.thakur@example.com
 
 ## 🚀 What's Next?
 
