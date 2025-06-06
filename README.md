@@ -190,7 +190,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: Check this README and inline help
 - **Issues**: Report bugs on [GitHub Issues](https://github.com/vpst1802/microcrowd/issues)
 - **Discussions**: Join community discussions in [GitHub Discussions](https://github.com/vpst1802/microcrowd/discussions)
-- **Email**: Contact the maintainer at vinay.thakur@example.com
+- **Email**: Contact the maintainer at vpst18@gmail.com
 
 ## 🚀 What's Next?
 
