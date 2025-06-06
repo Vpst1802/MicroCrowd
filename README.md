@@ -9,7 +9,9 @@
 
 ## 🚀 Overview
 
-MicroCrowd revolutionizes market research by converting your existing CSV data into authentic AI-powered personas that participate in realistic focus group discussions. Unlike traditional surveys or generic AI responses, MicroCrowd creates natural, personality-driven conversations that mirror real focus group dynamics.
+MicroCrowd bridges the gap between static data and dynamic human insights by transforming consumer datasets into interactive personas for experimental research. Traditional market research methods are limited by cost, time, and participant availability, while generic AI lacks the nuanced diversity of real human perspectives. MicroCrowd enables researchers and strategists to conduct focus group simulations with authentic personality-driven responses, making advanced research methodologies accessible for experimentation across diverse scenarios—from product testing and user experience research to academic studies and strategic planning.
+
+This a framework working model and not scaled for mass use. 
 
 ### ✨ Key Features
 
