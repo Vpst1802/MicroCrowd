@@ -13,10 +13,7 @@ MicroCrowd bridges the gap between static data and dynamic human insights by tra
 
 This a framework working model and not scaled for mass use. 
 
-<video width="600" controls>
-  <source src="Microcrowd Walkthrough.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+<video src="https://github.com/vtmade/MicroCrowd/blob/main/Microcrowd%20Walkthrough.mp4" controls></video>
 
 
 
