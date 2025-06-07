@@ -13,6 +13,8 @@ MicroCrowd bridges the gap between static data and dynamic human insights by tra
 
 This a framework working model and not scaled for mass use. 
 
+https://github.com/vtmade/MicroCrowd/blob/main/Microcrowd%20Walkthrough.mp4
+
 ### ✨ Key Features
 
 - **🔄 CSV-to-Persona Transformation**: Convert any CSV dataset into rich, multi-dimensional personas
