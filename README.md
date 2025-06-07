@@ -183,12 +183,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🚀 What's Next?
 
 ### Planned Features
+- **MicroCrowd-Researcher**: Python based backend for researchers to go under the hood and optimise for reseaech based enhancement
 - **Advanced Analytics**: Sentiment analysis and theme extraction
 - **Export Formats**: PDF reports, Excel summaries
-- **Custom Moderation**: Upload your own moderator styles
-- **Integration APIs**: Connect with survey platforms and CRM systems
-- **Multi-language Support**: Conduct focus groups in different languages
-- **Video Avatars**: Visual representation of personas
+- **Custom Moderation**: Upload your own moderator *Integration APIs**: Connect with survey platforms and CRM systems
+
 
 ### Community Roadmap
 Want to influence the future of MicroCrowd? Join our discussions and share your ideas!
