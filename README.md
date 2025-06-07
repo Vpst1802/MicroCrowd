@@ -13,7 +13,11 @@ MicroCrowd bridges the gap between static data and dynamic human insights by tra
 
 This a framework working model and not scaled for mass use. 
 
-<video src="https://github.com/vtmade/MicroCrowd/blob/main/Microcrowd%20Walkthrough.mp4" controls></video>
+## Demo
+
+Check out MicroCrowd in action:
+
+https://github.com/vtmade/MicroCrowd/blob/main/.github/ISSUE_TEMPLATE/Microcrowd%20Walkthrough.mp4
 
 
 
