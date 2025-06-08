@@ -17,7 +17,7 @@ This a framework working model and not scaled for mass use.
 
 Check out MicroCrowd in action in demo video
 
-https://youtube.com/shorts/AY5Szz0Rdgs?feature=share
+https://youtube.com/shorts/WjuCvi4yywE
 
 
 
