@@ -15,9 +15,10 @@ This a framework working model and not scaled for mass use.
 
 ## Demo
 
-Check out MicroCrowd in action:
+Check out MicroCrowd in action in demo video
 
-https://github.com/vtmade/MicroCrowd/blob/main/.github/ISSUE_TEMPLATE/Microcrowd%20Walkthrough.mp4
+https://youtube.com/shorts/AY5Szz0Rdgs?feature=share
+
 
 
 
@@ -82,6 +83,8 @@ https://github.com/vtmade/MicroCrowd/blob/main/.github/ISSUE_TEMPLATE/Microcrowd
    ```env
    API_KEY=your_openai_api_key_here
    ```
+  - In your MicroCrowd folder, create a `.env` file using env example file
+  - Replace `your_openai_api_key_here` with your actual OpenAI API key
 
 4. **Start the development server**
    ```bash
