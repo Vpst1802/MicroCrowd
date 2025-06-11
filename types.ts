@@ -1,10 +1,12 @@
 
+import React from 'react';
+
 export interface PersonaProfile {
   id: string;
   name: string;
   age: number;
   gender: string;
-  location:string;
+  location: string;
   occupation: {
     title: string;
     industry: string;
@@ -44,6 +46,25 @@ export interface PersonaProfile {
   };
   generatedSummary: string; 
   sourceData?: Record<string, string>;
+  // Enhanced persona fields (optional for backward compatibility)
+  personality_descriptions?: {
+    openness: string;
+    conscientiousness: string;
+    extraversion: string;
+    agreeableness: string;
+    neuroticism: string;
+  };
+  applied_fragments?: string[];
+  fragment_confidence_scores?: Record<string, number>;
+  communication_patterns?: string[];
+  participation_level?: string;
+  response_length_tendency?: string;
+  expertise_areas?: string[];
+  discussion_goals?: string[];
+  decision_factors?: string[];
+  pain_points?: string[];
+  emotional_triggers?: string[];
+  created_at?: string;
 }
 
 export type PartialPersonaProfile = Omit<PersonaProfile, 'id'>;
@@ -67,7 +88,11 @@ export interface NavItemType {
 export interface SimulationTurn {
   speaker: 'Moderator' | string; // Persona name or 'Moderator'
   text: string;
+  content?: string; // Enhanced backend uses 'content' instead of 'text'
   timestamp: string; // ISO string for date
+  turn_number?: number;
+  persona_id?: string;
+  validation_score?: number;
 }
 
 export type SimulationStatus = 'idle' | 'running' | 'paused' | 'ended';
@@ -87,5 +112,6 @@ export interface SimulationSession {
   moderatorType: 'AI'; // For now, only AI moderator for autonomous mode
   maxTurns: number; // Max number of moderator-led interaction cycles
   currentTurnNumber: number;
+  moderatorTurnCount?: number; // Track moderator turns separately from total turns
   status: SimulationStatus;
 }

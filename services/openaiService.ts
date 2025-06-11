@@ -6,6 +6,7 @@ import {
     SIMULATION_RESPONSE_PROMPT,
     AI_MODERATOR_PROMPT
 } from "../constants";
+import { conversationOrchestrator } from './conversationOrchestrator';
 
 const getApiKey = (): string => {
   const apiKey = process.env.API_KEY;
@@ -111,66 +112,99 @@ export async function* getPersonaSimulationResponse(
     simulationTopic: string,
     researchGoal: string,
     conversationHistory: SimulationTurn[],
-    latestQuestionOrStatement: string
+    latestQuestionOrStatement: string,
+    allParticipants: PersonaProfile[] = []
 ): AsyncGenerator<string, void, undefined> {
     const openaiInstance = getOpenAIInstance();
 
-    // Create rich persona context for authentic responses
-    const personaProfileString = JSON.stringify({
-        name: persona.name,
-        age: persona.age,
-        gender: persona.gender,
-        location: persona.location,
-        occupation: persona.occupation,
-        personality: persona.personality,
-        preferences: persona.preferences,
-        behaviors: persona.behaviors,
-        goals: persona.goals,
-        background: persona.background,
-        generatedSummary: persona.generatedSummary
-    }, null, 2);
+    // Initialize conversation orchestrator if this is the first call
+    if (conversationHistory.length === 0 || !localStorage.getItem(`conversation_initialized_${simulationTopic}`)) {
+        conversationOrchestrator.initializeConversation(simulationTopic, allParticipants, researchGoal);
+        localStorage.setItem(`conversation_initialized_${simulationTopic}`, 'true');
+    }
 
-    const recentHistory = conversationHistory.slice(-5);
-    const conversationHistoryString = recentHistory
-        .map(turn => `${turn.speaker}: ${turn.text}`)
-        .join('\n');
+    // Use conversation orchestrator to prepare enhanced response
+    const responseGeneration = conversationOrchestrator.preparePersonaResponse(
+        persona,
+        simulationTopic,
+        conversationHistory,
+        latestQuestionOrStatement,
+        allParticipants
+    );
 
-    const prompt = SIMULATION_RESPONSE_PROMPT
-        .replace('{personaName}', persona.name)
-        .replace('{personaProfileString}', personaProfileString)
-        .replace('{simulationTopic}', simulationTopic)
-        .replace('{latestQuestionOrStatement}', latestQuestionOrStatement)
-        .replace('{extraversion}', persona.personality.extraversion.toString());
+    if (!responseGeneration.shouldProceed) {
+        console.warn('Response generation blocked:', responseGeneration.validationIssues);
+        yield `[System: Response validation failed for ${persona.name}]`;
+        return;
+    }
+
+    // Use enhanced prompt from orchestrator
+    const enhancedPrompt = responseGeneration.enhancedPrompt;
     
     try {
-        // Adjust temperature based on personality for more natural variation
-        const baseTemp = 0.9;
-        const personalityVariation = (persona.personality.openness - 3) * 0.1; // More open = more creative responses
-        const extraversionVariation = (persona.personality.extraversion - 3) * 0.05; // More extroverted = more varied responses
-        const finalTemp = Math.max(0.7, Math.min(1.2, baseTemp + personalityVariation + extraversionVariation));
+        // Adjust temperature based on personality and emotional state
+        let baseTemp = 0.9;
+        
+        // Higher temperature for high emotional intensity
+        if (responseGeneration.responseModifiers.emotionalIntensity === 'high') {
+            baseTemp = 1.1;
+        } else if (responseGeneration.responseModifiers.emotionalIntensity === 'low') {
+            baseTemp = 0.7;
+        }
+
+        // Personality-based temperature variation
+        const personalityVariation = (persona.personality.openness - 3) * 0.1;
+        const extraversionVariation = (persona.personality.extraversion - 3) * 0.05;
+        const finalTemp = Math.max(0.6, Math.min(1.3, baseTemp + personalityVariation + extraversionVariation));
+
+        // Adjust max tokens based on response length modifier
+        let maxTokens = 150; // Default
+        if (responseGeneration.responseModifiers.responseLength === 'short') {
+            maxTokens = 80;
+        } else if (responseGeneration.responseModifiers.responseLength === 'long') {
+            maxTokens = 250;
+        }
 
         const stream = await openaiInstance.chat.completions.create({
             model: OPENAI_MODEL_NAME,
             messages: [
                 {
                     role: "user",
-                    content: prompt
+                    content: enhancedPrompt
                 }
             ],
             temperature: finalTemp,
-            max_tokens: 150, // Limit response length to encourage brevity
+            max_tokens: maxTokens,
             stream: true
         });
 
+        let generatedResponse = '';
+        
         for await (const chunk of stream) {
             const content = chunk.choices[0]?.delta?.content;
             if (content) {
+                generatedResponse += content;
                 yield content;
             }
         }
 
+        // Post-process the response with conversation orchestrator
+        const validation = conversationOrchestrator.validateAndProcessResponse(
+            persona,
+            generatedResponse,
+            conversationHistory
+        );
+
+        if (!validation.isValid && validation.validationIssues.length > 0) {
+            console.warn(`Response validation issues for ${persona.name}:`, validation.validationIssues);
+            // Could potentially regenerate or fix the response here
+        }
+
+        // Log successful response generation
+        console.log(`Enhanced response generated for ${persona.name} with emotional intensity: ${responseGeneration.responseModifiers.emotionalIntensity}`);
+
     } catch (error) {
-        throw handleOpenAIApiError(error, `streaming simulation response for ${persona.name}`);
+        throw handleOpenAIApiError(error, `streaming enhanced simulation response for ${persona.name}`);
     }
 }
 
@@ -192,29 +226,119 @@ export async function* getAIModeratorAction(
     const moderatorTurns = transcript.filter(turn => turn.speaker === 'Moderator');
     const turnCount = moderatorTurns.length;
     
-    // Add context about discussion stage and guide progress
+    // Analyze conversation dynamics for moderator context
+    const recentParticipantTurns = transcript.slice(-6).filter(t => t.speaker !== 'Moderator');
+    const agreementWords = ['agree', 'exactly', 'totally', 'same', 'yeah', 'definitely', 'absolutely'];
+    const agreementCount = recentParticipantTurns.reduce((count, turn) => {
+        return count + agreementWords.filter(word => turn.text.toLowerCase().includes(word)).length;
+    }, 0);
+    
+    const avgResponseLength = recentParticipantTurns.reduce((sum, turn) => sum + turn.text.length, 0) / Math.max(1, recentParticipantTurns.length);
+    
+    // Detect participation patterns
+    const participationCounts = participatingPersonas.reduce((counts, persona) => {
+        counts[persona.name] = transcript.filter(t => t.speaker === persona.name).length;
+        return counts;
+    }, {} as Record<string, number>);
+    
+    const totalTurns = Object.values(participationCounts).reduce((sum, count) => sum + count, 0);
+    const avgTurns = totalTurns / participatingPersonas.length;
+    
+    const dominators = participatingPersonas.filter(p => participationCounts[p.name] > avgTurns * 1.5).map(p => p.name);
+    const quietParticipants = participatingPersonas.filter(p => participationCounts[p.name] < avgTurns * 0.5).map(p => p.name);
+    
+    // Get conversation insights from orchestrator
+    let conversationInsights = null;
+    try {
+        conversationInsights = conversationOrchestrator.getConversationInsights(transcript, participatingPersonas);
+    } catch (error) {
+        console.warn('Could not get conversation insights:', error);
+    }
+
+    // Add context about discussion stage and dynamics
     let stageContext = '';
     if (turnCount === 0) {
         stageContext = '\n\nCONTEXT: This is the very beginning. Start with a warm welcome and introduce the FIRST topic from your discussion guide exactly as written.';
     } else if (turnCount < 3) {
         stageContext = '\n\nCONTEXT: Early stage - stay focused on the FIRST topic from your discussion guide. Probe deeper with follow-up questions before moving on.';
     } else {
-        const topicsExplored = Math.floor(turnCount / 2); // Rough estimate of topics covered
+        const topicsExplored = Math.floor(turnCount / 2);
         if (topicsExplored < discussionGuideLines.length) {
             stageContext = `\n\nCONTEXT: Discussion turn ${turnCount + 1}. You've covered roughly ${topicsExplored} topics. Focus on the NEXT unaddressed topic from your discussion guide, or probe deeper on current topic if participants need more exploration.`;
         } else {
             stageContext = `\n\nCONTEXT: Discussion turn ${turnCount + 1}. You've covered most topics. Continue with remaining discussion guide items or probe for deeper insights on key topics.`;
         }
     }
+
+    // Add enhanced conversation insights
+    if (conversationInsights) {
+        stageContext += `\n\nENHANCED CONVERSATION ANALYSIS:`;
+        stageContext += `\nConsensus Level: ${Math.round(conversationInsights.consensusLevel * 100)}%`;
+        
+        if (conversationInsights.flowRecommendations.length > 0) {
+            const topRecommendation = conversationInsights.flowRecommendations[0];
+            stageContext += `\nTop Recommendation: ${topRecommendation.action} - ${topRecommendation.reason}`;
+            if (topRecommendation.suggestedIntervention) {
+                stageContext += `\nSuggested: "${topRecommendation.suggestedIntervention}"`;
+            }
+        }
+
+        // Participation balance insights
+        const participationEntries = Object.entries(conversationInsights.participationBalance);
+        const totalTurns = participationEntries.reduce((sum, [, count]) => sum + count, 0);
+        if (totalTurns > 0) {
+            const imbalancedParticipants = participationEntries.filter(([name, count]) => {
+                const percentage = (count / totalTurns) * 100;
+                return percentage > 50 || percentage < 10;
+            });
+            
+            if (imbalancedParticipants.length > 0) {
+                stageContext += `\nParticipation Imbalance Detected: Consider balancing airtime`;
+            }
+        }
+    }
     
-    // Add specific instruction about guide adherence
-    stageContext += '\n\nIMPORTANT: Your discussion guide is your script. Follow it line by line. Each topic/question in the guide should be addressed before moving to the next.';
+    // TinyTroupe-style conversation dynamics context
+    const interventionContext = localStorage.getItem('currentInterventionContext');
+    let dynamicsContext = '';
+    
+    if (interventionContext) {
+        const intervention = JSON.parse(interventionContext);
+        dynamicsContext = `\nCURRENT INTERVENTION CONTEXT:\nPriority: ${intervention.priority}\nInstruction: ${intervention.instruction}\nTone: ${intervention.tone}\n`;
+        localStorage.removeItem('currentInterventionContext'); // Clear after use
+    } else {
+        // Provide general conversation state awareness
+        dynamicsContext = `\nCONVERSATION STATE AWARENESS:\n`;
+        
+        if (agreementCount >= 3) {
+            dynamicsContext += `- Agreement level: HIGH (${agreementCount} indicators) - Consider exploring different perspectives\n`;
+        }
+        
+        if (dominators.length > 0) {
+            dynamicsContext += `- Participation: ${dominators.join(', ')} speaking frequently - May need to balance airtime\n`;
+        }
+        
+        if (quietParticipants.length > 0) {
+            dynamicsContext += `- Quiet voices: ${quietParticipants.join(', ')} - Natural opportunity to include them\n`;
+        }
+        
+        if (avgResponseLength < 30) {
+            dynamicsContext += `- Energy level: LOW (short responses) - May need to revitalize discussion\n`;
+        }
+        
+        dynamicsContext += `- Discussion momentum: ${turnCount < 3 ? 'BUILDING' : turnCount < 8 ? 'ACTIVE' : 'MATURE'}\n`;
+        dynamicsContext += `- Natural intervention needed: ${turnCount > 6 && moderatorTurns.length < 2 ? 'YES' : 'MINIMAL'}\n`;
+    }
+    
+    stageContext += dynamicsContext;
+    stageContext += '\n\nREMEMBER: Use minimal intervention. Let natural conversation flow unless research goals require guidance.';
 
     const prompt = AI_MODERATOR_PROMPT
         .replace('{researchGoal}', researchGoal)
         .replace('{discussionGuide}', discussionGuide)
         .replace('{participantNamesString}', participantNamesString)
-        .replace('{transcriptString}', transcript.length > 0 ? transcriptString : "The focus group has not started yet.") + stageContext;
+        .replace('{transcriptString}', transcript.length > 0 ? transcriptString : "The focus group has not started yet.")
+        .replace('{conversationDynamicsContext}', dynamicsContext) + stageContext;
 
     try {
         const stream = await openaiInstance.chat.completions.create({
@@ -253,4 +377,53 @@ export async function* getAIModeratorAction(
     } catch (error) {
         throw handleOpenAIApiError(error, "streaming AI moderator action");
     }
+}
+
+export function resetConversationEngine(topic?: string): void {
+    // Clear all conversation state
+    if (topic) {
+        localStorage.removeItem(`conversation_initialized_${topic}`);
+        // Clear all stance data for this topic
+        Object.keys(localStorage).forEach(key => {
+            if (key.includes(`stance_`) && key.includes(`_${topic}`)) {
+                localStorage.removeItem(key);
+            }
+        });
+    } else {
+        // Clear all conversation-related localStorage
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('conversation_initialized_') || 
+                key.startsWith('stance_') || 
+                key.includes('PersonaContext') ||
+                key.includes('InterventionContext')) {
+                localStorage.removeItem(key);
+            }
+        });
+    }
+    
+    console.log('Conversation engine reset for', topic || 'all topics');
+}
+
+export function getConversationEngineStatus(): {
+    isActive: boolean;
+    currentTopics: string[];
+    activeStances: number;
+} {
+    const conversationKeys = Object.keys(localStorage).filter(key => 
+        key.startsWith('conversation_initialized_')
+    );
+    
+    const currentTopics = conversationKeys.map(key => 
+        key.replace('conversation_initialized_', '')
+    );
+    
+    const stanceKeys = Object.keys(localStorage).filter(key => 
+        key.startsWith('stance_')
+    );
+    
+    return {
+        isActive: conversationKeys.length > 0,
+        currentTopics,
+        activeStances: stanceKeys.length
+    };
 }
