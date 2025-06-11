@@ -6,7 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "backend:install": "cd ../microcrowd-enhanced/backend && chmod +x start.sh && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt",
+    "backend:start": "cd ../microcrowd-enhanced/backend && bash -c 'source venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload'",
+    "backend:setup": "cd ../microcrowd-enhanced/backend && ./start.sh",
+    "start": "npm run backend:start & npm run dev",
+    "start:full": "concurrently \"npm run backend:start\" \"npm run dev\""
   },
   "dependencies": {
     "react": "^19.1.0",
@@ -17,6 +22,7 @@
   "devDependencies": {
     "@types/node": "^22.14.0",
     "typescript": "~5.7.2",
-    "vite": "^6.2.0"
+    "vite": "^6.2.0",
+    "concurrently": "^9.1.0"
   }
 }
