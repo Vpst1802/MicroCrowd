@@ -9,7 +9,18 @@
 
 ## 🚀 Overview
 
-MicroCrowd revolutionizes market research by converting your existing CSV data into authentic AI-powered personas that participate in realistic focus group discussions. Unlike traditional surveys or generic AI responses, MicroCrowd creates natural, personality-driven conversations that mirror real focus group dynamics.
+MicroCrowd bridges the gap between static data and dynamic human insights by transforming consumer datasets into interactive personas for experimental research. Traditional market research methods are limited by cost, time, and participant availability, while generic AI lacks the nuanced diversity of real human perspectives. MicroCrowd enables researchers and strategists to conduct focus group simulations with authentic personality-driven responses, making advanced research methodologies accessible for experimentation across diverse scenarios—from product testing and user experience research to academic studies and strategic planning.
+
+This a framework working model and not scaled for mass use. 
+
+## Demo
+
+Check out MicroCrowd in action in demo video
+
+https://youtube.com/shorts/WjuCvi4yywE
+
+
+
 
 ### ✨ Key Features
 
@@ -72,6 +83,8 @@ MicroCrowd revolutionizes market research by converting your existing CSV data i
    ```env
    API_KEY=your_openai_api_key_here
    ```
+  - In your MicroCrowd folder, create a `.env` file using env example file
+  - Replace `your_openai_api_key_here` with your actual OpenAI API key
 
 4. **Start the development server**
    ```bash
@@ -122,21 +135,9 @@ Mike Chen,45,Small Business Owner,Austin,55000,Sports;Family,High School
 ## 🎭 Understanding Persona Behavior
 
 ### Personality-Driven Responses
-Each persona exhibits authentic behavior patterns:
-
-- **Extroverted (4-5/5)**: Respond frequently, speak faster, jump in quickly
-- **Introverted (1-2/5)**: Respond rarely, take time think, give brief answers
-- **Agreeable**: More likely to support others' ideas
-- **Disagreeable**: More likely to challenge or offer contrasting views
-- **Open**: Creative responses, embrace new ideas
-- **Conscientious**: Detail-oriented, practical considerations
+Each persona exhibits authentic behavior 
 
 ### Natural Conversation Patterns
-- **Varied Response Lengths**: From one-word answers to detailed explanations
-- **Realistic Participation**: Not everyone responds to every question
-- **Authentic Speech**: Natural fillers like "um," "well," "you know"
-- **Human Quirks**: Unfinished thoughts, tangents, misunderstandings
-- **Dynamic Interaction**: Build on others' comments, show agreement/disagreement
 
 ## 🔧 Configuration
 
@@ -154,7 +155,7 @@ OPENAI_MODEL=gpt-4o-mini          # Optional: Model to use (default: gpt-4o-mini
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help makes MicroCrowd better for everyone.
+Welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help makes MicroCrowd better for everyone.
 
 ### Ways to Contribute
 - 🐛 **Bug Reports**: Found an issue? Open a GitHub issue
@@ -188,23 +189,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: Check this README and inline help
 - **Issues**: Report bugs on [GitHub Issues](https://github.com/vpst1802/microcrowd/issues)
 - **Discussions**: Join community discussions in [GitHub Discussions](https://github.com/vpst1802/microcrowd/discussions)
-- **Email**: Contact the maintainer at vinay.thakur@example.com
+- **Email**: Contact the maintainer at vpst18@gmail.com
 
 ## 🚀 What's Next?
 
 ### Planned Features
+- **MicroCrowd-Researcher**: Python based backend for researchers to go under the hood and optimise for reseaech based enhancement
 - **Advanced Analytics**: Sentiment analysis and theme extraction
 - **Export Formats**: PDF reports, Excel summaries
-- **Custom Moderation**: Upload your own moderator styles
-- **Integration APIs**: Connect with survey platforms and CRM systems
-- **Multi-language Support**: Conduct focus groups in different languages
-- **Video Avatars**: Visual representation of personas
+- **Custom Moderation**: Upload your own moderator *Integration APIs**: Connect with survey platforms and CRM systems
+
 
 ### Community Roadmap
 Want to influence the future of MicroCrowd? Join our discussions and share your ideas!
 
 ---
 
-**Built with ❤️ for the research community**
-
-*Transform your data into insights, one conversation at a time.*
+**Built with ❤️ for the opensource community**

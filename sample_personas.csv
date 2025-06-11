@@ -1,6 +1,6 @@
-name,age,occupation_title,industry,location,interests,education,family_status,income_range
-Sarah Mitchell,34,Marketing Manager,Technology,Austin Texas,hiking sustainable living yoga,Bachelor's Marketing,Married with 2 kids,$75000-$95000
-Marcus Johnson,28,Software Engineer,Tech Startup,San Francisco,gaming cryptocurrency fitness,Master's Computer Science,Single,$85000-$110000
-Elena Rodriguez,45,School Teacher,Education,Phoenix Arizona,reading gardening community volunteering,Master's Education,Divorced 1 child,$45000-$55000
-David Kim,52,Accountant,Finance,Chicago Illinois,golf cooking travel,CPA License,Married empty nester,$95000-$120000
-Priya Patel,29,Nurse,Healthcare,Atlanta Georgia,meditation cooking social justice,Bachelor's Nursing,In relationship,$55000-$70000
+persona_id,first_name,age,gender,education,profession,income_level,location_type,political_leaning,climate_awareness_level,climate_concern_level,trust_in_science,information_source,personality_openness,personality_conscientiousness,attitude_individual_impact,attitude_government_role,attitude_business_responsibility,behavior_recycling,behavior_energy_conservation,behavior_transportation_choices,behavior_consumption_patterns,primary_barrier_to_action,motivation_for_action
+P001,Sarah,34,Female,Bachelor's Degree,Marketing Manager,Middle,Urban,Liberal,High,High,High,News Media,High,High,Moderate,Strong,Strong,Always,Often,Sometimes,Conscious,Time Constraints,Environmental Legacy
+P002,Mike,58,Male,High School,Construction Worker,Lower-Middle,Suburban,Conservative,Low,Low,Low,Social Media,Low,Moderate,Low,Weak,Weak,Rarely,Rarely,Never,Unconcerned,Economic Concerns,Job Security
+P003,Jennifer,42,Female,Master's Degree,Teacher,Middle,Suburban,Moderate,Moderate,Moderate,Moderate,Multiple Sources,Moderate,High,Moderate,Moderate,Moderate,Often,Often,Often,Selective,Conflicting Information,Children's Future
+P004,Alex,29,Male,Bachelor's Degree,Software Engineer,Upper-Middle,Urban,Liberal,High,Moderate,High,Scientific Journals,High,Low,High,Strong,Strong,Sometimes,Sometimes,Always,Conscious,Individual Helplessness,Technology Solutions
+P005,Dorothy,67,Female,Some College,Retired Nurse,Lower-Middle,Rural,Conservative,Low,Moderate,Moderate,Television,Low,High,Low,Weak,Moderate,Often,Always,Never,Traditional,Skepticism,Grandchildren

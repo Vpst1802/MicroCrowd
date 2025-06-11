@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Responsive design for desktop and mobile
 - Modern ES modules and clean architecture
 
-## [1.0.0] - 2024-XX-XX
+## [1.0.0] - 4 June 2025
 
 ### Added
 - Initial public release
