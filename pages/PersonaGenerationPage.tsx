@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PersonaProfile } from '../types';
-import { generateMultiplePersonasFromCSVData } from '../services/openaiService';
 import { parseCSV, CSVParseResult } from '../services/csvService';
+import enhancedApiService from '../services/enhancedApiService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { UserPlusIcon, WarningIcon, InfoIcon, UploadIcon } from '../constants';
 
@@ -17,6 +17,26 @@ const PersonaGenerationPage: React.FC<PersonaGenerationPageProps> = ({ addPerson
   const [generatedCount, setGeneratedCount] = useState(0);
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
   const [parseErrors, setParseErrors] = useState<string[]>([]);
+  const [backendStatus, setBackendStatus] = useState<'checking' | 'healthy' | 'unhealthy'>('checking');
+
+  // Check enhanced backend health on component mount
+  useEffect(() => {
+    const checkBackendHealth = async () => {
+      try {
+        const health = await enhancedApiService.checkHealth();
+        if (health.status === 'healthy') {
+          setBackendStatus('healthy');
+        } else {
+          setBackendStatus('unhealthy');
+        }
+      } catch (error) {
+        console.error('Enhanced backend not available:', error);
+        setBackendStatus('unhealthy');
+      }
+    };
+
+    checkBackendHealth();
+  }, []);
 
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,10 +104,56 @@ const PersonaGenerationPage: React.FC<PersonaGenerationPageProps> = ({ addPerson
         setParseErrors(prev => [...prev, `Note: CSV has ${parseResult.data.length} rows, but only the first 10 will be processed in this demo.`]);
       }
 
+      if (backendStatus !== 'healthy') {
+        setError('Enhanced backend is not available. Please ensure the Python backend is running and accessible.');
+        setIsLoading(false);
+        return;
+      }
 
-      const newPersonas = await generateMultiplePersonasFromCSVData(dataToProcess);
-      addPersonas(newPersonas);
-      setGeneratedCount(newPersonas.length);
+      // Use enhanced backend
+      const response = await enhancedApiService.generatePersonasFromData(dataToProcess);
+      
+      if (response.success && response.data.personas) {
+        // Convert enhanced personas to standard PersonaProfile format
+        const newPersonas = response.data.personas.map(enhancedPersona => ({
+          id: enhancedPersona.id,
+          name: enhancedPersona.name,
+          age: enhancedPersona.age,
+          gender: enhancedPersona.gender,
+          location: enhancedPersona.location,
+          occupation: enhancedPersona.occupation,
+          personality: enhancedPersona.personality,
+          preferences: enhancedPersona.preferences,
+          behaviors: enhancedPersona.behaviors,
+          goals: enhancedPersona.goals,
+          background: enhancedPersona.background,
+          generatedSummary: enhancedPersona.generated_summary,
+          sourceData: enhancedPersona.source_data,
+          // Enhanced fields
+          personality_descriptions: enhancedPersona.personality_descriptions,
+          applied_fragments: enhancedPersona.applied_fragments,
+          fragment_confidence_scores: enhancedPersona.fragment_confidence_scores,
+          communication_patterns: enhancedPersona.communication_patterns,
+          participation_level: enhancedPersona.participation_level,
+          response_length_tendency: enhancedPersona.response_length_tendency,
+          expertise_areas: enhancedPersona.expertise_areas,
+          discussion_goals: enhancedPersona.discussion_goals,
+          decision_factors: enhancedPersona.decision_factors,
+          pain_points: enhancedPersona.pain_points,
+          emotional_triggers: enhancedPersona.emotional_triggers,
+          created_at: enhancedPersona.created_at
+        }));
+
+        // Show processing summary if available
+        if (response.data.summary.warnings.length > 0) {
+          setParseErrors(prev => [...prev, ...response.data.summary.warnings]);
+        }
+
+        addPersonas(newPersonas);
+        setGeneratedCount(newPersonas.length);
+      } else {
+        throw new Error(response.message || 'Enhanced backend returned invalid response');
+      }
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -113,9 +179,36 @@ const PersonaGenerationPage: React.FC<PersonaGenerationPageProps> = ({ addPerson
       
       <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg text-sm text-indigo-700">
         <InfoIcon className="inline w-5 h-5 mr-1 mb-0.5 text-indigo-600" />
-        Upload a CSV file where each row represents a potential persona. Key headers like 'name', 'age', 'location', 'occupation_title', 'industry', 'interests' (comma-separated) will be prioritized. The AI will fill in remaining details.
+        Upload a CSV file where each row represents a potential persona. Key headers like 'name', 'age', 'location', 'occupation_title', 'industry', 'interests' (comma-separated) will be prioritized. The enhanced AI will generate sophisticated personas with psychological profiling, personality fragments, and conversation patterns.
         <br />
-        <strong>Note:</strong> The current CSV parser is basic and does not support commas within quoted fields. Ensure your CSV is simple. Max 10 rows processed in this demo.
+        <strong>Note:</strong> Max 10 rows processed in this demo.
+      </div>
+
+      {/* Backend Status */}
+      <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+        <div className="flex items-center space-x-2">
+          <span className="text-sm font-medium text-slate-700">Enhanced Backend Status:</span>
+          <div className="flex items-center space-x-1">
+            <div className={`w-2 h-2 rounded-full ${
+              backendStatus === 'checking' ? 'bg-yellow-500' :
+              backendStatus === 'healthy' ? 'bg-green-500' : 'bg-red-500'
+            }`}></div>
+            <span className="text-xs text-slate-600">
+              {backendStatus === 'checking' ? 'Checking Enhanced Backend...' :
+               backendStatus === 'healthy' ? 'Enhanced Backend Available' : 'Enhanced Backend Unavailable'}
+            </span>
+          </div>
+        </div>
+        {backendStatus === 'healthy' && (
+          <p className="mt-2 text-xs text-green-700">
+            ✓ Advanced psychological profiling, personality fragments, and behavioral validation enabled
+          </p>
+        )}
+        {backendStatus === 'unhealthy' && (
+          <p className="mt-2 text-xs text-red-600">
+            ⚠️ Enhanced backend required. Please ensure the Python backend is running at the configured URL.
+          </p>
+        )}
       </div>
 
 
@@ -143,7 +236,10 @@ const PersonaGenerationPage: React.FC<PersonaGenerationPageProps> = ({ addPerson
           <InfoIcon className="w-5 h-5 mr-2 mt-0.5 text-green-600" />
           <div>
             <strong className="font-bold">Success!</strong>
-            <span className="block sm:inline ml-1">{generatedCount} persona(s) generated successfully. View them in the 'View Personas' tab.</span>
+            <span className="block sm:inline ml-1">
+              {generatedCount} enhanced persona(s) generated successfully with advanced psychological profiling. 
+              View them in the 'View Personas' tab.
+            </span>
           </div>
         </div>
       )}
@@ -187,18 +283,18 @@ const PersonaGenerationPage: React.FC<PersonaGenerationPageProps> = ({ addPerson
         
         <button
           onClick={handleGeneratePersonas}
-          disabled={isLoading || !file}
+          disabled={isLoading || !file || backendStatus !== 'healthy'}
           className="w-full flex items-center justify-center px-4 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-slate-400 disabled:hover:bg-slate-400 transition-colors"
         >
           {isLoading ? (
             <>
               <LoadingSpinner size="sm" />
-              <span className="ml-2">Generating from CSV...</span>
+              <span className="ml-2">Generating Enhanced Personas...</span>
             </>
           ) : (
             <>
               <UserPlusIcon className="w-5 h-5 mr-2" />
-              Generate Personas from CSV
+              Generate Enhanced Personas from CSV
             </>
           )}
         </button>

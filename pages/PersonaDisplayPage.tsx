@@ -11,13 +11,20 @@ interface PersonaDisplayPageProps {
 const PersonaDisplayPage: React.FC<PersonaDisplayPageProps> = ({ personas, deletePersona }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
+
   const filteredPersonas = useMemo(() => {
     if (!searchTerm) return personas;
+    const term = searchTerm.toLowerCase();
     return personas.filter(p => 
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.occupation.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.generatedSummary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.preferences.interests.some(i => i.toLowerCase().includes(searchTerm.toLowerCase()))
+      p.name.toLowerCase().includes(term) ||
+      p.occupation.title.toLowerCase().includes(term) ||
+      p.generatedSummary.toLowerCase().includes(term) ||
+      p.preferences.interests.some(i => i.toLowerCase().includes(term)) ||
+      // Enhanced persona search fields
+      (p.applied_fragments && p.applied_fragments.some(f => f.toLowerCase().includes(term))) ||
+      (p.expertise_areas && p.expertise_areas.some(e => e.toLowerCase().includes(term))) ||
+      (p.communication_patterns && p.communication_patterns.some(c => c.toLowerCase().includes(term))) ||
+      (p.participation_level && p.participation_level.toLowerCase().includes(term))
     );
   }, [personas, searchTerm]);
 
@@ -36,10 +43,15 @@ const PersonaDisplayPage: React.FC<PersonaDisplayPageProps> = ({ personas, delet
   return (
     <div className="p-4 md:p-6">
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <h2 className="text-2xl font-semibold text-slate-800 flex items-center">
-          <UsersIcon className="w-7 h-7 mr-2 text-indigo-600" />
-          Available Personas ({filteredPersonas.length})
-        </h2>
+        <div>
+          <h2 className="text-2xl font-semibold text-slate-800 flex items-center">
+            <UsersIcon className="w-7 h-7 mr-2 text-indigo-600" />
+            Enhanced Personas ({filteredPersonas.length})
+          </h2>
+          <p className="text-sm text-slate-600 mt-1">
+            AI-powered personas with advanced psychological profiling
+          </p>
+        </div>
         <input 
           type="text"
           placeholder="Search personas..."
