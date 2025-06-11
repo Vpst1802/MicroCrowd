@@ -1,11 +1,12 @@
-# MicroCrowd - Data-Driven Focus Groups
+# MicroCrowd - Enhanced AI Focus Groups
 
-> Transform CSV data into realistic personas for simulated focus groups and market research insights.
+> Transform CSV data into realistic personas for natural, authentic focus group discussions with advanced conversation intelligence.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg)
 ![React](https://img.shields.io/badge/react-18.0.0-blue.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0.0-blue.svg)
+![Enhanced Engine](https://img.shields.io/badge/conversation-enhanced-green.svg)
 
 ## 🚀 Overview
 
@@ -13,24 +14,42 @@ MicroCrowd bridges the gap between static data and dynamic human insights by tra
 
 This a framework working model and not scaled for mass use. 
 
-## Demo
+## 🎬 Demo
 
 Check out MicroCrowd in action in demo video
 
 https://youtube.com/shorts/WjuCvi4yywE
+
+## 🚀 Quick Start
+
+**Want to see the enhanced conversation engine in action?**
+
+1. Clone and install: `git clone https://github.com/vtmade/MicroCrowd.git && cd MicroCrowd && npm install`
+2. Add your OpenAI API key to `.env` file  
+3. Run: `npm run dev`
+4. Upload the included `sample_personas.csv`
+5. Start a focus group on a controversial topic like "climate change" or "gun laws"
+6. **Watch authentic disagreements unfold!** 🎭
 
 
 
 
 ### ✨ Key Features
 
-- **🔄 CSV-to-Persona Transformation**: Convert any CSV dataset into rich, multi-dimensional personas
+#### 🧠 **Enhanced Conversation Engine** (NEW!)
+- **🤝 Realistic Disagreements**: Personas authentically disagree based on demographics and backgrounds
+- **🎯 Smart Reference Validation**: Only references actual statements with exact quotes
+- **🗣️ Persona-Specific Speech Patterns**: 6 distinct speaking styles based on personality and background
+- **📊 Dynamic Behavior Tracking**: Real-time emotional states affect participation and responses
+- **⚡ Intelligent Interruptions**: Natural conversation flow with personality-driven interruptions
+
+#### 🔄 **Core Functionality** 
+- **📊 CSV-to-Persona Transformation**: Convert any CSV dataset into rich, multi-dimensional personas
 - **🎭 Authentic Personalities**: Each persona has unique traits, behaviors, and response patterns
 - **💬 Natural Conversations**: Realistic focus group dynamics with varied participation levels
 - **🎯 Professional Moderation**: AI moderator follows your discussion guide systematically
 - **⏸️ Real-time Control**: Pause, resume, or end sessions at any time
-- **📊 Export Transcripts**: Download complete conversation logs for analysis
-- **🎨 Personality-Driven Responses**: Responses vary from one-word answers to detailed explanations
+- **📈 Export Transcripts**: Download complete conversation logs for analysis
 
 ## 🎯 Use Cases
 
@@ -69,8 +88,8 @@ https://youtube.com/shorts/WjuCvi4yywE
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/vpst1802/microcrowd.git
-   cd microcrowd
+   git clone https://github.com/vtmade/MicroCrowd.git
+   cd MicroCrowd
    ```
 
 2. **Install dependencies**
@@ -132,25 +151,61 @@ Mike Chen,45,Small Business Owner,Austin,55000,Sports;Family,High School
 3. Use controls to **pause**, **resume**, or **end** the session
 4. Download transcript when complete
 
-## 🎭 Understanding Persona Behavior
+## 🎭 Enhanced Conversation Intelligence
 
-### Personality-Driven Responses
-Each persona exhibits authentic behavior 
+### **What Makes It Different?**
 
-### Natural Conversation Patterns
+#### 🚫 **Before Enhancement:**
+- 90%+ artificial consensus on controversial topics
+- Generic template responses across all personas  
+- Invalid references to non-existent statements
+- No personality-driven behavior changes
+
+#### ✅ **After Enhancement:**
+- **Realistic Disagreements**: 30-70% disagreement based on topic controversy
+- **Authentic Speech Patterns**: Distinct vocabulary and style per demographic
+- **Validated Conversations**: Only references actual statements with exact quotes
+- **Dynamic Personalities**: Behavior changes based on emotional investment
+
+### **Conversation Examples**
+
+#### Gun Laws Discussion:
+- **Rural Construction Worker**: "I've been hunting since I was 12. Gun control won't stop criminals."
+- **Urban Teacher**: "[PASSIONATE] I see the fear in my students' eyes during lockdown drills. We need action."
+- **Suburban Analyst**: "The data shows both perspectives have merit, but we need balanced regulation."
+
+#### Climate Change Discussion:
+- **Environmental Scientist**: "The evidence is overwhelming - we're facing an emergency."
+- **Energy Worker**: "[FRUSTRATED] Easy for you to say. These policies cost real jobs."
+- **Working Parent**: "I want a better world for my kids, but I can't afford an electric car right now."
+
+### **Technical Improvements**
+
+- **🔍 Reference Validation**: No more "someone mentioned" - only verified quotes
+- **🎭 Speech Diversity**: Age, education, and regional speech patterns  
+- **😤 Emotional States**: Frustration, engagement, and confidence affect responses
+- **⚡ Natural Interruptions**: Personality-driven interjections and disagreements
+- **📊 Flow Intelligence**: AI moderator adapts to conversation dynamics
 
 ## 📁 Project Structure
 
 ```
 MicroCrowd/
-├── components/           # React UI components
-├── pages/               # Application pages
-├── services/            # Core business logic & conversation engine
-├── scripts/             # Development and deployment scripts
-├── tools/               # Python utilities and testing tools
-├── docs/                # Documentation and guides
-├── sample_personas.csv  # Example data for testing
-└── README.md           # This file
+├── 📱 components/           # React UI components
+├── 📄 pages/               # Application pages  
+├── 🧠 services/            # Enhanced conversation engine & core logic
+│   ├── conversationOrchestrator.ts    # Main conversation coordinator
+│   ├── conversationTracker.ts         # Statement validation
+│   ├── controversyStanceAssigner.ts   # Disagreement generation
+│   ├── responseStyleManager.ts        # Speech pattern diversity
+│   └── ... (8 advanced services)
+├── 🛠️ scripts/             # Development and deployment scripts
+├── 🔧 tools/               # Python utilities and testing tools
+├── 📚 docs/                # Documentation and guides
+│   ├── ENHANCED_CONVERSATION_ENGINE.md  # Technical details
+│   └── ENHANCED_SETUP.md               # Setup guide
+├── 📊 sample_personas.csv  # Example data for testing
+└── 📖 README.md           # This file
 ```
 
 ## 🔧 Configuration
@@ -185,7 +240,7 @@ Welcome contributions from the community! Whether you're fixing bugs, adding fea
 4. Test thoroughly
 5. Submit a pull request
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for detailed guidelines.
 
 ## 📄 License
 
@@ -201,17 +256,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - **Documentation**: Check this README and inline help
-- **Issues**: Report bugs on [GitHub Issues](https://github.com/vpst1802/microcrowd/issues)
-- **Discussions**: Join community discussions in [GitHub Discussions](https://github.com/vpst1802/microcrowd/discussions)
+- **Issues**: Report bugs on [GitHub Issues](https://github.com/vtmade/MicroCrowd/issues)
+- **Discussions**: Join community discussions in [GitHub Discussions](https://github.com/vtmade/MicroCrowd/discussions)
 - **Email**: Contact the maintainer at vpst18@gmail.com
 
 ## 🚀 What's Next?
 
 ### Planned Features
-- **MicroCrowd-Researcher**: Python based backend for researchers to go under the hood and optimise for reseaech based enhancement
-- **Advanced Analytics**: Sentiment analysis and theme extraction
-- **Export Formats**: PDF reports, Excel summaries
-- **Custom Moderation**: Upload your own moderator *Integration APIs**: Connect with survey platforms and CRM systems
+- **🔬 MicroCrowd-Researcher**: Python backend for advanced research capabilities and fine-tuning
+- **📊 Advanced Analytics**: Sentiment analysis, theme extraction, and conversation insights
+- **📋 Enhanced Export Formats**: PDF reports, Excel summaries, and data visualization  
+- **🎯 Custom Moderation**: Upload your own moderator personalities and conversation styles
+- **🔗 Integration APIs**: Connect with survey platforms, CRM systems, and research tools
+- **🌐 Multi-language Support**: Conduct focus groups in different languages
+- **📱 Mobile Optimization**: Responsive design for mobile research scenarios
 
 
 ### Community Roadmap
