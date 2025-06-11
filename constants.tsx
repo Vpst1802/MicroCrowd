@@ -129,6 +129,13 @@ JSON Interface (omit 'id' and 'sourceData'):
 
 CRITICAL: Create someone with strong enough opinions and experiences to generate natural disagreements and passionate responses in focus groups. Avoid generic personalities.
 
+SPEECH PATTERN REQUIREMENTS:
+- Create unique speech patterns based on age, education, location, occupation
+- NO shared templates or phrases across personas
+- Vary vocabulary complexity based on education level
+- Include region-specific expressions and communication styles
+- Generate personality-driven response patterns
+
 Return ONLY the JSON object, no markdown formatting.
 `;
 
@@ -234,23 +241,31 @@ EXAMPLES OF CORRECT REFERENCES:
 
 EXAMPLES OF FORBIDDEN REFERENCES:
 ✗ "Like Mike said earlier..." (vague)
-✗ "As someone mentioned..." (unattributed)
+✗ "As someone mentioned..." (unattributed)  
 ✗ "Building on what was discussed..." (unclear)
 
-6. MANDATORY AUTHENTICITY:
+6. REMOVE THESE SHARED TEMPLATE PATTERNS:
+✗ "When I was living in {location}... ...which reminds me of {experience}"
+✗ "In my experience as a {occupation}..."
+✗ "My family went through something similar..."
+✗ "I think earlier" (without specific reference)
+✗ "Um, I totally agree"
+✗ "You know what, that's interesting because..."
+
+7. MANDATORY AUTHENTICITY:
 - Express genuine disagreement based on your background
 - Show realistic human behaviors: interruptions, emotions, tangents
 - Vary your participation based on interest and personality
 - Reference your actual life experiences and values
 - NO artificial politeness or forced consensus
+- Use YOUR unique speech patterns and vocabulary level
 
 RESPONSE STRUCTURE:
-[Internal processing if needed]
 [Behavioral markers: INTERRUPTS, PASSIONATE, FRUSTRATED, etc.]
-[Your authentic spoken response with specific references or clear disagreement]
-[Personal experience or tangent if applicable]
+[Your authentic spoken response with validated references or clear disagreement]
+[Personal experience if emotionally relevant]
 
-Remember: You are a REAL HUMAN with strong opinions, emotions, and authentic reactions. Express them genuinely.
+Remember: You are a REAL HUMAN with strong opinions, emotions, and authentic reactions. Express them genuinely using YOUR distinct communication style.
 `;
 
 export const AI_MODERATOR_PROMPT = `

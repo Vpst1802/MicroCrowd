@@ -5,6 +5,10 @@ import { responseStyleManager, PersonaResponseStyle } from './responseStyleManag
 import { behaviorStateTracker, BehaviorState } from './behaviorStateTracker';
 import { conversationFlowController, FlowRecommendation } from './conversationFlowController';
 import { disagreementEnforcer, DisagreementInjection } from './disagreementEnforcer';
+import { conversationStateManager } from './conversationStateManager';
+import { turnManager, TurnDecision } from './turnManager';
+import { referenceValidator, ValidationResult as ReferenceValidationResult } from './referenceValidator';
+import { stanceManager } from './stanceManager';
 
 export interface ConversationContext {
   topic: string;
@@ -37,11 +41,17 @@ export class ConversationOrchestrator {
     participants: PersonaProfile[],
     researchGoal: string
   ): void {
-    // Reset all services
+    // Reset all core systems
     conversationTracker.reset();
     conversationFlowController.resetConversation(topic);
     behaviorStateTracker.resetConversation();
     responseStyleManager.clearPersonaStyles();
+    conversationStateManager.reset();
+    turnManager.reset();
+    stanceManager.reset();
+
+    // Initialize conversation state management
+    conversationStateManager.initializeConversation(participants);
 
     // Initialize behavior tracking for all participants
     participants.forEach(persona => {
@@ -49,8 +59,8 @@ export class ConversationOrchestrator {
       responseStyleManager.generatePersonaStyle(persona);
     });
 
-    // Assign controversial stances for disagreement
-    const assignedStances = controversyStanceAssigner.assignPoliticalPositions(participants, topic);
+    // Assign controversial stances using enhanced stance manager
+    const assignedStances = stanceManager.assignStances(participants, topic);
     
     // Store stances in localStorage for persistence during conversation
     participants.forEach(persona => {
@@ -59,6 +69,13 @@ export class ConversationOrchestrator {
         localStorage.setItem(`stance_${persona.name}_${topic}`, JSON.stringify(stance));
       }
     });
+
+    // Log initialization
+    console.log(`🧠 Enhanced Conversation Engine Initialized:
+    - Topic: ${topic}
+    - Participants: ${participants.length}
+    - Stances Assigned: ${assignedStances.size}
+    - Core Systems: ✅ All Active`);
 
     this.isInitialized = true;
   }
@@ -89,22 +106,41 @@ export class ConversationOrchestrator {
     // Get current behavior modifiers
     const behaviorModifiers = behaviorStateTracker.getBehaviorModifiers(persona.id);
 
-    // Check for disagreement injection needs
-    const assignedStances = this.loadAssignedStances(allParticipants, topic);
-    const disagreementInjection = disagreementEnforcer.injectDisagreement(
-      allParticipants,
-      conversationHistory.slice(-5),
-      assignedStances,
-      topic
-    );
-
-    // Check if this persona should be forced to disagree
+    // Enhanced disagreement enforcement using stance manager
+    const disagreementContext = stanceManager.requiresDisagreement(topic, conversationHistory.slice(-5));
     let forceDisagreement = false;
     let disagreementPrompt = '';
-    
-    if (disagreementInjection && disagreementInjection.targetPersona.id === persona.id) {
-      forceDisagreement = true;
-      disagreementPrompt = disagreementInjection.disagreementPrompt;
+
+    if (disagreementContext.needsDisagreement) {
+      // Check if this persona should generate disagreement
+      const lastResponse = conversationHistory[conversationHistory.length - 1]?.text || '';
+      const disagreementResponse = stanceManager.enforceDisagreement(
+        persona,
+        lastResponse,
+        topic,
+        conversationHistory
+      );
+
+      if (disagreementResponse) {
+        forceDisagreement = true;
+        disagreementPrompt = `You must express disagreement. Your stance: ${disagreementResponse}`;
+      }
+    }
+
+    // Fallback to original disagreement enforcer if stance manager doesn't handle it
+    if (!forceDisagreement) {
+      const assignedStances = this.loadAssignedStances(allParticipants, topic);
+      const disagreementInjection = disagreementEnforcer.injectDisagreement(
+        allParticipants,
+        conversationHistory.slice(-5),
+        assignedStances,
+        topic
+      );
+
+      if (disagreementInjection && disagreementInjection.targetPersona.id === persona.id) {
+        forceDisagreement = true;
+        disagreementPrompt = disagreementInjection.disagreementPrompt;
+      }
     }
 
     // Get conversation flow recommendations
@@ -143,28 +179,49 @@ export class ConversationOrchestrator {
   validateAndProcessResponse(
     persona: PersonaProfile,
     generatedResponse: string,
-    conversationHistory: SimulationTurn[]
+    conversationHistory: SimulationTurn[],
+    allParticipants: PersonaProfile[]
   ): {
     isValid: boolean;
     processedResponse: string;
     validationIssues: string[];
+    referenceIssues: any[];
   } {
     const validationIssues: string[] = [];
 
-    // Detect invalid references
-    const referenceIssues = conversationTracker.detectInvalidReferences(generatedResponse, persona.name);
-    validationIssues.push(...referenceIssues);
+    // Enhanced reference validation using new reference validator
+    const referenceValidation = referenceValidator.validateResponse(
+      generatedResponse,
+      conversationHistory,
+      persona.name,
+      allParticipants
+    );
+
+    if (!referenceValidation.isValid) {
+      validationIssues.push(...referenceValidation.warnings);
+    }
+
+    // Use corrected response from reference validator
+    let processedResponse = referenceValidation.correctedResponse;
 
     // Apply persona-specific linguistic patterns
-    let processedResponse = responseStyleManager.varyLinguisticPatterns(persona, generatedResponse);
+    processedResponse = responseStyleManager.varyLinguisticPatterns(persona, processedResponse);
 
-    // Remove shared template patterns if detected
-    processedResponse = this.removeSharedPatterns(processedResponse);
+    // Additional conversation tracker validation (legacy support)
+    const legacyIssues = conversationTracker.detectInvalidReferences(processedResponse, persona.name);
+    validationIssues.push(...legacyIssues);
+
+    // Update conversation state
+    if (validationIssues.length === 0) {
+      conversationStateManager.addStatement(persona.name, processedResponse);
+      turnManager.updateTurnHistory(persona.name);
+    }
 
     return {
       isValid: validationIssues.length === 0,
       processedResponse,
-      validationIssues
+      validationIssues,
+      referenceIssues: referenceValidation.issues
     };
   }
 
@@ -175,30 +232,35 @@ export class ConversationOrchestrator {
   ): {
     shouldInterrupt: boolean;
     interruptionText?: string;
+    interruptionStyle?: string;
   } {
-    const interruptionTrigger = behaviorStateTracker.shouldInterrupt(
+    // Use enhanced turn manager for interruption handling
+    const interruptionDecision = turnManager.handleInterruption(
       persona,
       currentSpeaker,
       statementContent
     );
 
-    if (interruptionTrigger.shouldInterrupt) {
-      const assignedStance = this.getPersonaStance(persona);
-      let interruptionText = '';
+    if (interruptionDecision.allowInterruption) {
+      let interruptionText = interruptionDecision.interruptionText || '';
 
-      if (assignedStance && interruptionTrigger.interruptionStyle === 'passionate') {
-        interruptionText = `[INTERRUPTS] ${controversyStanceAssigner.generateDisagreementResponse(
+      // Enhance with stance-based disagreement if available
+      const assignedStance = this.getPersonaStance(persona);
+      if (assignedStance && interruptionDecision.interruptionStyle === 'passionate') {
+        const disagreementText = controversyStanceAssigner.generateDisagreementResponse(
           persona,
           statementContent,
           assignedStance
-        )}`;
-      } else {
-        interruptionText = `[INTERRUPTS] ${this.generateGenericInterruption(persona, interruptionTrigger.interruptionStyle || 'polite')}`;
+        );
+        interruptionText = `[INTERRUPTS] ${disagreementText}`;
+      } else if (!interruptionText) {
+        interruptionText = `[INTERRUPTS] ${this.generateGenericInterruption(persona, interruptionDecision.interruptionStyle)}`;
       }
 
       return {
         shouldInterrupt: true,
-        interruptionText
+        interruptionText,
+        interruptionStyle: interruptionDecision.interruptionStyle
       };
     }
 
@@ -330,22 +392,14 @@ export class ConversationOrchestrator {
     return null;
   }
 
-  private removeSharedPatterns(response: string): string {
-    // Remove common shared template patterns
-    const sharedPatterns = [
-      /When I was living in .+?\.\.\. \.\.\.which reminds me of .+?/gi,
-      /Um, yeah, I totally agree/gi,
-      /I think earlier/gi,
-      /Like someone mentioned/gi,
-      /As was discussed/gi
-    ];
-
-    let cleaned = response;
-    sharedPatterns.forEach(pattern => {
-      cleaned = cleaned.replace(pattern, '');
-    });
-
-    return cleaned.trim();
+  private getNextSpeaker(
+    personas: PersonaProfile[],
+    conversationHistory: SimulationTurn[],
+    topic: string
+  ): PersonaProfile {
+    // Use turn manager to decide next speaker
+    const turnDecision = turnManager.decideNextSpeaker(conversationHistory, personas, topic);
+    return turnDecision.nextSpeaker;
   }
 
   private generateGenericInterruption(persona: PersonaProfile, style: string): string {

@@ -188,16 +188,19 @@ export async function* getPersonaSimulationResponse(
             }
         }
 
-        // Post-process the response with conversation orchestrator
+        // Post-process the response with enhanced conversation orchestrator
         const validation = conversationOrchestrator.validateAndProcessResponse(
             persona,
             generatedResponse,
-            conversationHistory
+            conversationHistory,
+            allParticipants
         );
 
         if (!validation.isValid && validation.validationIssues.length > 0) {
-            console.warn(`Response validation issues for ${persona.name}:`, validation.validationIssues);
-            // Could potentially regenerate or fix the response here
+            console.warn(`🔍 Response validation issues for ${persona.name}:`, validation.validationIssues);
+            if (validation.referenceIssues.length > 0) {
+                console.warn(`📝 Reference issues detected:`, validation.referenceIssues);
+            }
         }
 
         // Log successful response generation
