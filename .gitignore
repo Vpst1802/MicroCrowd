@@ -27,3 +27,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Temporary files and IDE artifacts
+metadata.json
+new file
+*.tmp
+*.temp
+.vscode/settings.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo

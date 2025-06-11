@@ -139,6 +139,20 @@ Each persona exhibits authentic behavior
 
 ### Natural Conversation Patterns
 
+## 📁 Project Structure
+
+```
+MicroCrowd/
+├── components/           # React UI components
+├── pages/               # Application pages
+├── services/            # Core business logic & conversation engine
+├── scripts/             # Development and deployment scripts
+├── tools/               # Python utilities and testing tools
+├── docs/                # Documentation and guides
+├── sample_personas.csv  # Example data for testing
+└── README.md           # This file
+```
+
 ## 🔧 Configuration
 
 ### Environment Variables
